@@ -10,6 +10,7 @@ interface Todo {
 const App = () => {
   const [text, setText] = useState("");
   const [todoItem, setTodoItem] = useState<Todo[]>([]);
+  console.log(todoItem)
 
   // 추가 클릭시 텍스트를 todoItem text로 추가해야함.
   const handleSubmit = (e: React.FormEvent<HTMLFormElement> | SubmitEvent) => {
@@ -24,6 +25,9 @@ const App = () => {
 
   const handleDelete = (item: Todo) => {
     console.log(item.id, "삭제")
+    console.log(item)
+    // item.isDeleted상태를 true로 변경해야함
+    setTodoItem(todoItem.map(todo => todo.id !== item.id ? todo : {...todo, isDeleted: true}))
   }
 
   return (
@@ -35,13 +39,24 @@ const App = () => {
       </form>
       <div>
         <h2>TodoList Item</h2>
-        {todoItem.map(item => (
+        <div>
+          <ul className="flex gap-2">
+            <li><button>전체</button></li>
+            <li><button>완료</button></li>
+            <li><button>삭제</button></li>
+          </ul>
+        </div>
+        {todoItem ? todoItem.map(item => (
           <div key={item.id} className="flex items-center gap-2">
             <input type="checkbox"/>
             <p>{item.value}</p>
             <button onClick={() => handleDelete(item)}>삭제</button>
           </div>
-        ))}
+        )) : (
+          <div>
+            <p>데이터가 없습니다.</p>
+          </div>
+        )}
       </div>
     </div>
   );
