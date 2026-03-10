@@ -23,9 +23,11 @@ const App = () => {
     },]);
   }
 
+  const handleComplete = (item: Todo) => {
+    setTodoItem(todoItem.map(todo => todo.id !== item.id ? todo : {...todo, isCompleted: !todo.isCompleted}))
+  }
+
   const handleDelete = (item: Todo) => {
-    console.log(item.id, "삭제")
-    console.log(item)
     // item.isDeleted상태를 true로 변경해야함
     setTodoItem(todoItem.map(todo => todo.id !== item.id ? todo : {...todo, isDeleted: true}))
   }
@@ -50,10 +52,11 @@ const App = () => {
             <li><button onClick={() => handleFilter('delete')}>삭제</button></li>
           </ul>
         </div>
+
         {todoItem ? todoItem.map(item => (
           <div key={item.id} className="flex items-center gap-2">
-            <input type="checkbox"/>
-            <p>{item.value}</p>
+            <input type="checkbox" id={`todo_${item.id}`} onChange={() => handleComplete(item)} checked={item.isCompleted}/>
+            <label htmlFor={`todo_${item.id}`}>{item.value}</label>
             <button onClick={() => handleDelete(item)}>삭제</button>
           </div>
         )) : (
