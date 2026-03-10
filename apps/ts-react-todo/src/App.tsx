@@ -1,68 +1,50 @@
 import {useState} from "react";
 
-type Item = {
+interface Todo {
   id: number;
-  text: string;
+  value: string;
   isCompleted: boolean;
+  isDeleted: boolean;
 }
 
-const isTrimmed = (text: string) => {
-  return text.trim() !== "";
-}
-
-function App() {
+const App = () => {
   const [text, setText] = useState("");
-  const [items, setItems] = useState<Item[]>([]);
-  const [itemIdx, setItemIdx] = useState<number>(1);
+  const [todoItem, setTodoItem] = useState<Todo[]>([]);
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  // 추가 클릭시 텍스트를 todoItem text로 추가해야함.
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement> | SubmitEvent) => {
     e.preventDefault();
-    if (!isTrimmed(text)) {
-      alert("공백 ㄴㄴ");
-      return;
-    } else {
-      setItems([...items, {id: itemIdx, text, isCompleted: false}]);
-      setItemIdx(() => itemIdx + 1);
-      setText("");
-    }
+    setTodoItem([...todoItem, {
+      id: todoItem.length + 1,
+      value: text,
+      isCompleted: false,
+      isDeleted: false,
+    },]);
   }
 
-  const handleUpdate = (item: Item) => {
-    const updatedItems = items.map(i => i.id === item.id ? {...i, isCompleted: !i.isCompleted} : i);
-    setItems(updatedItems);
-  }
-
-  const handleDelete = (id: number) => {
-    setItems(items.filter(item => item.id !== id));
+  const handleDelete = (item: Todo) => {
+    console.log(item.id, "삭제")
   }
 
   return (
-    <div className='w-full'>
-      <main className='flex flex-col gap-4 items-center'>
-        <h1 className='text-center text-5xl'>Todo List</h1>
-        <div>
-          <form onSubmit={handleSubmit}>
-            <div className='flex border-2'>
-              <input type="text" value={text} onChange={(e) => setText(e.target.value)} className='w-full rounded-none'/>
-              <button className='bg-blue-500 text-white px-4 py-2 cursor-pointer'>Submit</button>
-            </div>
-          </form>
-          <ul>
-            {/* 추가된 아이템 */}
-            {items.map((item) => (
-              <li key={item.id} className='flex items-center gap-2'>
-                <input id={item.id.toString()} type="checkbox" checked={item.isCompleted} onChange={() => handleUpdate(item)}/>
-                <label htmlFor={item.id.toString()}>
-                  <span className={item.isCompleted ? 'line-through' : ''}>{item.text}</span>
-                </label>
-                <button onClick={() => handleDelete(item.id)}>삭제</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </main>
+    <div>
+      <h1>todo</h1>
+      <form onSubmit={handleSubmit}>
+        <input type="text" onChange={(e) => setText(e.target.value)}/>
+        <button>추가</button>
+      </form>
+      <div>
+        <h2>TodoList Item</h2>
+        {todoItem.map(item => (
+          <div key={item.id} className="flex items-center gap-2">
+            <input type="checkbox"/>
+            <p>{item.value}</p>
+            <button onClick={() => handleDelete(item)}>삭제</button>
+          </div>
+        ))}
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
