@@ -30,6 +30,10 @@ const App = () => {
     setTodoItem(todoItem.map(todo => todo.id !== item.id ? todo : {...todo, isDeleted: true}))
   }
 
+  const handleFilter = (filterType: string) => {
+    console.log(filterType)
+  }
+
   return (
     <div>
       <h1>todo</h1>
@@ -41,9 +45,9 @@ const App = () => {
         <h2>TodoList Item</h2>
         <div>
           <ul className="flex gap-2">
-            <li><button>전체</button></li>
-            <li><button>완료</button></li>
-            <li><button>삭제</button></li>
+            <li><button onClick={() => handleFilter('all')}>전체</button></li>
+            <li><button onClick={() => handleFilter('complete')}>완료</button></li>
+            <li><button onClick={() => handleFilter('delete')}>삭제</button></li>
           </ul>
         </div>
         {todoItem ? todoItem.map(item => (
