@@ -7,10 +7,12 @@ interface Todo {
   isDeleted: boolean;
 }
 
+type FilterType = 'all' | 'complete' | 'delete';
+
 const App = () => {
   const [text, setText] = useState("");
   const [todoItem, setTodoItem] = useState<Todo[]>([]);
-  console.log(todoItem)
+  const [todoFilter, setTodoFilter] = useState<FilterType>('all');
 
   // 추가 클릭시 텍스트를 todoItem text로 추가해야함.
   const handleSubmit = (e: React.FormEvent<HTMLFormElement> | SubmitEvent) => {
@@ -33,8 +35,18 @@ const App = () => {
   }
 
   const handleFilter = (filterType: string) => {
-    console.log(filterType)
+    setTodoFilter(filterType as FilterType);
   }
+
+  const filterItem = todoItem.filter(item => {
+    const completeStatus = item.isCompleted && !item.isDeleted;
+    const deleteStatus = !item.isCompleted && item.isDeleted;
+    return todoFilter === 'all'
+      ? true
+      : todoFilter === 'complete'
+        ? completeStatus
+        : deleteStatus;
+  })
 
   return (
     <div>
@@ -44,26 +56,35 @@ const App = () => {
         <button>추가</button>
       </form>
       <div>
-        <h2>TodoList Item</h2>
+        {/* todo filter*/}
         <div>
           <ul className="flex gap-2">
-            <li><button onClick={() => handleFilter('all')}>전체</button></li>
-            <li><button onClick={() => handleFilter('complete')}>완료</button></li>
-            <li><button onClick={() => handleFilter('delete')}>삭제</button></li>
+            <li>
+              <button onClick={() => handleFilter('all')}>전체</button>
+            </li>
+            <li>
+              <button onClick={() => handleFilter('complete')}>완료</button>
+            </li>
+            <li>
+              <button onClick={() => handleFilter('delete')}>삭제</button>
+            </li>
           </ul>
         </div>
 
-        {todoItem ? todoItem.map(item => (
-          <div key={item.id} className="flex items-center gap-2">
-            <input type="checkbox" id={`todo_${item.id}`} onChange={() => handleComplete(item)} checked={item.isCompleted}/>
-            <label htmlFor={`todo_${item.id}`}>{item.value}</label>
-            <button onClick={() => handleDelete(item)}>삭제</button>
-          </div>
-        )) : (
-          <div>
-            <p>데이터가 없습니다.</p>
-          </div>
-        )}
+        {/* todo item */}
+        <div>
+          {todoItem.length !== 0 ? filterItem.map(item => (
+            <div key={item.id} className="flex items-center gap-2">
+              <input type="checkbox" id={`todo_${item.id}`} onChange={() => handleComplete(item)} checked={item.isCompleted}/>
+              <label htmlFor={`todo_${item.id}`}>{item.value}</label>
+              <button onClick={() => handleDelete(item)}>삭제</button>
+            </div>
+          )):(
+            <div>
+              <p>데이터가 없습니다.</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
