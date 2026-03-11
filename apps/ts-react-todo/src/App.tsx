@@ -3,6 +3,7 @@ import {useState} from "react";
 interface Todo {
   id: number;
   value: string;
+  isActive: boolean;
   isCompleted: boolean;
   isDeleted: boolean;
 }
@@ -13,6 +14,8 @@ const App = () => {
   const [text, setText] = useState("");
   const [todoItem, setTodoItem] = useState<Todo[]>([]);
   const [todoFilter, setTodoFilter] = useState<FilterType>('all');
+  const [editText, setEditText] = useState<string>("");
+  const [open, setOpen] = useState<boolean>(false);
 
   // 추가 클릭시 텍스트를 todoItem text로 추가해야함.
   const handleSubmit = (e: React.FormEvent<HTMLFormElement> | SubmitEvent) => {
@@ -20,11 +23,12 @@ const App = () => {
     setTodoItem([...todoItem, {
       id: todoItem.length + 1,
       value: text,
+      isActive: false,
       isCompleted: false,
       isDeleted: false,
     },]);
   }
-
+  console.log(editText, todoItem, todoFilter, open,)
   const handleComplete = (item: Todo) => {
     setTodoItem(todoItem.map(todo => todo.id !== item.id ? todo : {...todo, isCompleted: !todo.isCompleted}))
   }
@@ -36,6 +40,27 @@ const App = () => {
 
   const handleFilter = (filterType: string) => {
     setTodoFilter(filterType as FilterType);
+  }
+
+  const handleToggleEdit = (item: Todo) => {
+    setTodoItem(prev => prev.map(todo => todo.id === item.id ? {...todo, isActive: !todo.isActive} : todo));
+    setEditText(item.value);
+  }
+
+  const handleSaveEdit = (item: Todo) => {
+    setTodoItem(prev => prev.map(todo => todo.id === item.id ? {...todo, value: editText, isActive: false} : todo));
+  }
+
+  const handleCloseEdit = (item: Todo) => {
+    setTodoItem(prev => prev.map(todo => todo.id === item.id ? {...todo, isActive: false} : todo));
+  }
+
+  const handleOpen = () => {
+    setOpen(prev => !prev);
+  }
+
+  const handleClose = () => {
+    setOpen(false);
   }
 
   const filterItem = todoItem.filter(item => {
@@ -57,7 +82,7 @@ const App = () => {
       </form>
       <div>
         {/* todo filter*/}
-        <div>
+        <div id="todo-filter" className="flex justify-center">
           <ul className="flex gap-2">
             <li>
               <button onClick={() => handleFilter('all')}>전체</button>
@@ -70,16 +95,26 @@ const App = () => {
             </li>
           </ul>
         </div>
-
         {/* todo item */}
         <div>
           {todoItem.length !== 0 ? filterItem.map(item => (
-            <div key={item.id} className="flex items-center gap-2">
-              <input type="checkbox" id={`todo_${item.id}`} onChange={() => handleComplete(item)} checked={item.isCompleted}/>
-              <label htmlFor={`todo_${item.id}`}>{item.value}</label>
-              <button onClick={() => handleDelete(item)}>삭제</button>
+            <div key={item.id} className={`flex items-center gap-2 ${item.isDeleted ? 'opacity-50' : ''}`}>
+              {item.isActive && !item.isDeleted ? (
+                <>
+                  <input type="text" id={`todo_${item.id}`} onChange={(e) => setEditText(e.target.value)} value={editText}/>
+                  <button onClick={() => handleSaveEdit(item)}>수정 완료</button>
+                  <button onClick={() => handleCloseEdit(item)}>닫기</button>
+                </>
+              ) : (
+                <>
+                  <input type="checkbox" id={`todo_${item.id}`} onChange={() => handleComplete(item)} checked={item.isCompleted}/>
+                  <label htmlFor={`todo_${item.id}`}>{item.value}</label>
+                  <button onClick={() => handleToggleEdit(item)}>수정</button>
+                  <button onClick={() => handleDelete(item)}>삭제</button>
+                </>
+              )}
             </div>
-          )):(
+          )) : (
             <div>
               <p>데이터가 없습니다.</p>
             </div>
