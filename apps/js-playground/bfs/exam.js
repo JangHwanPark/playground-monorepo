@@ -31,6 +31,9 @@ while (queue.length > 0) {
     const ny = y + dy[d];
     console.log("nx ny",nx, ny)
 
+    // 통과조건1: 범위 안
+    // 통과조건2: 방문 안함
+    // 통과조건3: 1인 경우
     if (
       nx >= 0 && nx < n &&
       ny >= 0 && ny < m &&
